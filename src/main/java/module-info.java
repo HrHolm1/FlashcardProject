@@ -1,6 +1,7 @@
 module com.example.flashcardproject {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens com.example.flashcardproject to javafx.fxml;
