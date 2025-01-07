@@ -5,19 +5,32 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 
 public class FlashcardController {
-    @FXML
-    private Label welcomeText;
 
-    private TrainingController trainingController;
+    private Statistics statistics = new Statistics();
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+    private void handleEasy() {
+        statistics.answerStatistics("Easy");
+        System.out.println("Easy button clicked!");
     }
 
-    private void initialize() {
-        FXMLLoader fmlloader = new FXMLLoader(getClass().getResource("/fxml/training-view.fxml"));
-        trainingController = fmlloader.getController();
-
+    @FXML
+    private void handleMedium() {
+        statistics.answerStatistics("Medium");
+        System.out.println("Medium button clicked!");
     }
+
+    @FXML
+    private void handleHard() {
+        statistics.answerStatistics("Hard");
+        System.out.println("Hard button clicked!");
+    }
+
+    @FXML
+    private void handleAgain() {
+        statistics.answerStatistics("Again");
+        System.out.println("Again button clicked!");
+    }
+
+
 }
