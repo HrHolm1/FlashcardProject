@@ -18,6 +18,7 @@
                <children>
                   <HBox alignment="CENTER" spacing="10.0">
                      <children>
+                        <Button mnemonicParsing="false" onAction="#handleImportFiles" text="Import" />
                         <Button mnemonicParsing="false" onAction="#handleAgain" text="Again" />
                         <Button mnemonicParsing="false" onAction="#handleHard" text="Hard" />
                         <Button mnemonicParsing="false" onAction="#handleMedium" text="Medium" />

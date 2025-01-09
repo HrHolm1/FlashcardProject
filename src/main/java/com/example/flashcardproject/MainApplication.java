@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import javax.print.attribute.HashDocAttributeSet;
 import java.io.IOException;
 
 public class MainApplication extends Application {

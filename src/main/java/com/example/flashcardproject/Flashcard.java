@@ -12,17 +12,14 @@ public class Flashcard {
 
     private boolean isIrrelevant; // Allows the user to mark a card as irrelevant.
 
-    private int reviewScore; // 0 points if incorrect, 1 point if partially correct etc.
-
     private int index; // Gives each individual card an index used for queue system.
 
-    public Flashcard(String question, String answer, String imagePath, String topic, int index, int reviewScore) {
+    public Flashcard(String question, String answer, String imagePath, String topic, int index) {
         this.question = question;
         this.answer = answer;
         this.imagePath = imagePath;
         this.topic = topic;
         this.index = index;
-        this.reviewScore = reviewScore;
         this.isIrrelevant = false;
     }
 
@@ -64,14 +61,6 @@ public class Flashcard {
 
     public void setIndex(int index){
         this.index = index;
-    }
-
-    public int getReviewScore(){
-        return reviewScore;
-    }
-
-    public void setReviewScore(int reviewScore){
-        this.reviewScore = reviewScore;
     }
 
     public void markAsIrrelevant(){
