@@ -22,32 +22,52 @@ public class AnkiImporter {
         List<Flashcard> flashcards = new ArrayList<>();
         Scanner scanner = new Scanner(new File(textFilePath));
 
-        // Indstil tab som delimiter
-        scanner.useDelimiter("\t|\r\n|\n");
-
-        int index = 0;  // Start index til flashcards
-
+        int lineNumber = 0; // Tilføjer linjenummer for debugging
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
+            lineNumber++;
+
+            // Ignorer metadata-linjer, der starter med '#'
+            if (line.startsWith("#") || line.trim().isEmpty()) {
+                System.out.println("Metadata eller tom linje ignoreret på linje " + lineNumber + ": " + line);
+                continue;
+            }
+
+            // Split linjen på tabulator ('\t')
             String[] fields = line.split("\t");
 
-            // Validering af antal felter
-            if (fields.length < 2) continue; // Spring linjer over, hvis der ikke er spørgsmål/svar
+            // Kontrollér, at linjen har nok felter
+            if (fields.length >= 4) { // Mindst 4 felter (fx: id, kategori, billede, kunstner)
+                String id = fields[0]; // ID på kortet
+                String category = fields[1]; // Kategori
+                String deck = fields[2]; // Bunke
+                String imageHTML = fields[3]; // Billede som HTML
 
-            String question = fields[0];
-            String answer = fields[1];
-            String topic = (fields.length > 3) ? fields[3] : "General"; // Default topic
-            String imageName = (fields.length > 2) ? fields[2] : null;
+                // (Optional) Ekstra felter
+                String artist = fields.length > 4 ? fields[4] : "";
+                String title = fields.length > 5 ? fields[5] : "";
+                String year = fields.length > 6 ? fields[6] : "";
+                String style = fields.length > 7 ? fields[7] : "";
+                String region = fields.length > 8 ? fields[8] : "";
 
-            // Konstruer billedsti, hvis relevant
-            String imagePath = (imageName != null && !imageName.isEmpty()) ?
-                    imageFolderPath + File.separator + imageName : null;
+                // Udtræk billedsti fra HTML-tagget
+                String imagePath = null;
+                if (imageHTML.contains("src=\"")) {
+                    int startIndex = imageHTML.indexOf("src=\"") + 5;
+                    int endIndex = imageHTML.indexOf("\"", startIndex);
+                    if (startIndex > 0 && endIndex > startIndex) {
+                        imagePath = imageHTML.substring(startIndex, endIndex);
+                    }
+                }
 
-            // Opret Flashcard med index
-            Flashcard flashcard = new Flashcard(question, answer, imagePath, topic, index);
-            flashcards.add(flashcard);
+                // Tilføj et nyt flashcard til listen
+                Flashcard flashcard = new Flashcard(title, artist, imagePath, category, flashcards.size());
+                flashcards.add(flashcard);
 
-            index++; // Opdater index for næste flashcard
+            } else {
+                // Linjen har ikke nok felter - log en fejl
+                System.err.println("Ugyldig linje på linje " + lineNumber + " (ikke nok felter): " + line);
+            }
         }
 
         scanner.close();

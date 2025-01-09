@@ -3,15 +3,10 @@ package com.example.flashcardproject;
 public class Flashcard {
 
     private String question; // Shows the question tied to the card.
-
     private String answer; // Shows the answer for the given card.
-
     private String imagePath; // Each flashcard has an image tied to it, this is that path.
-
     private String topic; // Each flashcard has a certain topic tied it.
-
     private boolean isIrrelevant; // Allows the user to mark a card as irrelevant.
-
     private int index; // Gives each individual card an index used for queue system.
 
     public Flashcard(String question, String answer, String imagePath, String topic, int index) {
@@ -66,5 +61,4 @@ public class Flashcard {
     public void markAsIrrelevant(){
         this.isIrrelevant = true;
     }
-
 }
