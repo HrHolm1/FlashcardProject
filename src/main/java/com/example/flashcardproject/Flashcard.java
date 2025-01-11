@@ -1,13 +1,11 @@
 package com.example.flashcardproject;
 
 public class Flashcard {
-
-    private String question; // Shows the question tied to the card.
-    private String answer; // Shows the answer for the given card.
-    private String imagePath; // Each flashcard has an image tied to it, this is that path.
-    private String topic; // Each flashcard has a certain topic tied it.
-    private boolean isIrrelevant; // Allows the user to mark a card as irrelevant.
-    private int index; // Gives each individual card an index used for queue system.
+    private String question; // Titel på maleriet (spørgsmålet)
+    private String answer;   // Kunstnerens navn (svaret)
+    private String imagePath; // Stien til billedet af maleriet
+    private String topic;     // Emnet for kortet
+    private int index;        // Indeks for kortet (bruges til at styre rækkefølge)
 
     public Flashcard(String question, String answer, String imagePath, String topic, int index) {
         this.question = question;
@@ -15,50 +13,46 @@ public class Flashcard {
         this.imagePath = imagePath;
         this.topic = topic;
         this.index = index;
-        this.isIrrelevant = false;
     }
 
-    public String getQuestion(){
+    // Getters og setters
+    public String getQuestion() {
         return question;
     }
 
-    public void setQuestion(String question){
+    public void setQuestion(String question) {
         this.question = question;
     }
 
-    public String getAnswer(){
+    public String getAnswer() {
         return answer;
     }
 
-    public void setAnswer(String answer){
+    public void setAnswer(String answer) {
         this.answer = answer;
     }
 
-    public String getImagePath(){
+    public String getImagePath() {
         return imagePath;
     }
 
-    public void setImagePath(String imagePath){
+    public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
 
-    public String getTopic(){
+    public String getTopic() {
         return topic;
     }
 
-    public void setTopic(String topic){
+    public void setTopic(String topic) {
         this.topic = topic;
     }
 
-    public int getIndex(){
+    public int getIndex() {
         return index;
     }
 
-    public void setIndex(int index){
+    public void setIndex(int index) {
         this.index = index;
-    }
-
-    public void markAsIrrelevant(){
-        this.isIrrelevant = true;
     }
 }

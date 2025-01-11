@@ -1,95 +1,127 @@
 package com.example.flashcardproject;
 
-import java.io.*;
-import java.nio.file.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AnkiImporter {
 
-    private String textFilePath;
-    private String imageFolderPath;
+    private static final Logger LOGGER = Logger.getLogger(AnkiImporter.class.getName());
 
-    // Constructor
-    public AnkiImporter(String textFilePath, String imageFolderPath) {
-        this.textFilePath = textFilePath;
-        this.imageFolderPath = imageFolderPath;
+    private String filePath;
+    private String imageDirectory;
+
+    // Konstruktør der modtager både filePath og imageDirectory
+    public AnkiImporter(String filePath, String imageDirectory) {
+        this.filePath = filePath;
+        this.imageDirectory = imageDirectory;
     }
 
-    // Import flashcards fra tekstfil
+    // Metode til at importere flashcards fra tekstfilen
     public List<Flashcard> importFlashcards() throws IOException {
         List<Flashcard> flashcards = new ArrayList<>();
-        Scanner scanner = new Scanner(new File(textFilePath));
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
 
-        int lineNumber = 0; // Tilføjer linjenummer for debugging
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            lineNumber++;
+            // Skipper metadata linjer
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("#")) continue;
 
-            // Ignorer metadata-linjer, der starter med '#'
-            if (line.startsWith("#") || line.trim().isEmpty()) {
-                System.out.println("Metadata eller tom linje ignoreret på linje " + lineNumber + ": " + line);
-                continue;
-            }
+                // Splitter linjen op i kolonner
+                String[] columns = line.split("\t");
 
-            // Split linjen på tabulator ('\t')
-            String[] fields = line.split("\t");
-
-            // Kontrollér, at linjen har nok felter
-            if (fields.length >= 4) { // Mindst 4 felter (fx: id, kategori, billede, kunstner)
-                String id = fields[0]; // ID på kortet
-                String category = fields[1]; // Kategori
-                String deck = fields[2]; // Bunke
-                String imageHTML = fields[3]; // Billede som HTML
-
-                // (Optional) Ekstra felter
-                String artist = fields.length > 4 ? fields[4] : "";
-                String title = fields.length > 5 ? fields[5] : "";
-                String year = fields.length > 6 ? fields[6] : "";
-                String style = fields.length > 7 ? fields[7] : "";
-                String region = fields.length > 8 ? fields[8] : "";
-
-                // Udtræk billedsti fra HTML-tagget
-                String imagePath = null;
-                if (imageHTML.contains("src=\"")) {
-                    int startIndex = imageHTML.indexOf("src=\"") + 5;
-                    int endIndex = imageHTML.indexOf("\"", startIndex);
-                    if (startIndex > 0 && endIndex > startIndex) {
-                        imagePath = imageHTML.substring(startIndex, endIndex);
-                    }
+                // Tjekker at der er nok kolonner
+                if (columns.length < 7) {
+                    LOGGER.warning("Skipping line - not enough columns: " + line);
+                    continue;
                 }
 
-                // Tilføj et nyt flashcard til listen
-                Flashcard flashcard = new Flashcard(title, artist, imagePath, category, flashcards.size());
-                flashcards.add(flashcard);
+                try {
+                    // Henter data fra filen
+                    String imagePath = extractImagePath(columns[3]);  // Eksempel på billedsti
+                    String question = cleanHtmlTags(columns[5]);  // Tydeligvis maleriets titel
+                    String answer = cleanHtmlTags(columns[4]);  // Kunstnerens navn
+                    String topic = columns[2];  // Emnet for kortet
+                    int index = flashcards.size(); // Brug størrelsen på listen som indeks
 
-            } else {
-                // Linjen har ikke nok felter - log en fejl
-                System.err.println("Ugyldig linje på linje " + lineNumber + " (ikke nok felter): " + line);
+                    // Opretter flashcard objekt
+                    Flashcard flashcard = new Flashcard(question, answer, imagePath, topic, index);
+
+                    flashcards.add(flashcard);
+
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error reading line: " + line, e);
+                }
             }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Failed to read the file: " + filePath, e);
+            throw new RuntimeException(e);
         }
 
-        scanner.close();
         return flashcards;
     }
 
-    // Import billederne
-    public void importImages() throws IOException {
-        File imageFolder = new File(imageFolderPath);
 
-        // Hvis mappen ikke eksisterer, lav den
-        if (!imageFolder.exists()) {
-            imageFolder.mkdir();
-        }
+    // Metode til at importere billeder fra imageDirectory (kan udvides alt efter behov)
+    public void importImages() {
+        // Her kan du tilføje logikken til at håndtere billederne, f.eks. ved at kopiere dem til den ønskede mappe
+        System.out.println("Billeder importeret fra: " + imageDirectory); // Eksempel på besked
+    }
 
-        // Eksempel på at finde og kopiere billeder
-        File[] imageFiles = new File(textFilePath).listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".png"));
-
-        if (imageFiles != null) {
-            for (File image : imageFiles) {
-                Files.copy(image.toPath(), Paths.get(imageFolderPath, image.getName()), StandardCopyOption.REPLACE_EXISTING);
+    // Hjælper til at udtrække billedstien fra HTML (f.eks. <img src="path-to-image.jpg">)
+    private static String extractImagePath(String html) {
+        try {
+            String cleanedHtml = html.replace("\"\"", "\"").trim(); // Renser ekstra citationstegn
+            Document doc = Jsoup.parse(cleanedHtml);
+            Element img = doc.selectFirst("img");  // Finder den første <img> tag
+            if (img != null) {
+                return img.attr("src"); // Returnerer billedsti
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error extracting image path from HTML: " + html, e);
         }
+        return null; // Returnerer null hvis ingen billede findes
+    }
+
+    private String extractImageTitle(String html) {
+        try {
+            // Ryd op i ekstra citationstegn og trim whitespace
+            String cleanedHtml = html.replace("\"\"", "\"").trim();  // Erstat "" med "
+
+            // Parse den rensede HTML
+            Document doc = Jsoup.parse(cleanedHtml);
+
+            // Hent <img> elementet
+            Element img = doc.selectFirst("img");
+            if (img != null) {
+                // Returner billedets filnavn eller alt tekst som spørgsmål
+                String imageTitle = img.attr("alt");  // Du kan vælge at bruge filnavnet også (img.attr("src"))
+                if (imageTitle.isEmpty()) {
+                    // Hvis alt-teksten ikke er tilgængelig, brug filnavnet som spørgsmål
+                    imageTitle = img.attr("src");
+                }
+                return imageTitle;  // Returner den fundne titel
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error extracting image title from HTML: " + html, e);
+        }
+        return "";  // Hvis der ikke findes en titel, returner en tom streng
+    }
+
+    // Hjælper til at rense HTML tags fra tekst
+    public static String cleanHtmlTags(String input) {
+        if (input == null) {
+            return "";
+        }
+        return input.replaceAll("<[^>]*>", "").trim(); // Fjerner alle HTML tags
     }
 }

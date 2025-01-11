@@ -12,7 +12,7 @@ import java.util.List;
 public class FlashcardController {
 
     private Statistics statistics = new Statistics();
-    private AnkiImporter importer = new AnkiImporter("C:\\Users\\Rambo\\Desktop\\Great Works of Art__Artists2024.txt", "C:\\Users\\Rambo\\Desktop\\greatartists");
+    private AnkiImporter importer;
 
     @FXML
     private BorderPane root;
@@ -23,6 +23,9 @@ public class FlashcardController {
 
     @FXML
     private void initialize() {
+        // Initialiser AnkiImporter med de rette stier
+        importer = new AnkiImporter("C:\\Users\\Rambo\\Documents\\Flashcards\\Great Works of Art__Artists2024.txt", "C:\\Users\\Rambo\\Documents\\Flashcards\\greatartists");
+
         try {
             // Loader training-view.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("training-view.fxml"));

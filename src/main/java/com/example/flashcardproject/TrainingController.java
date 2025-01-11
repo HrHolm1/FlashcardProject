@@ -1,5 +1,6 @@
 package com.example.flashcardproject;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,7 +38,7 @@ public class TrainingController {
         }
 
         Flashcard currentCard = flashcards.get(currentIndex);
-        answerLabel.setText(currentCard.getAnswer());
+        answerLabel.setText(currentCard.getAnswer());  // Vist kunstnerens navn
         showAnswerButton.setDisable(true);
     }
 
@@ -63,14 +64,17 @@ public class TrainingController {
         }
 
         Flashcard currentCard = flashcards.get(index);
-        questionLabel.setText(currentCard.getQuestion());
+        questionLabel.setText(currentCard.getQuestion());  // Vist maleriets titel
 
-        String imagePath = currentCard.getImagePath();
+        String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Tilpas denne sti
+        String imagePath = basePath + currentCard.getImagePath();
         if (imagePath != null && !imagePath.isEmpty()) {
             Image image = new Image("file:" + imagePath);
             questionImage.setImage(image);
+            System.out.println("image path: " + imagePath);
         } else {
             questionImage.setImage(null);
+            System.out.println("image path is null");
         }
 
         answerLabel.setText("Answer is shown here");
