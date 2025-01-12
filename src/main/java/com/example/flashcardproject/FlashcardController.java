@@ -5,7 +5,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +29,6 @@ public class FlashcardController {
 
     @FXML
     private void initialize() {
-        importer = new AnkiImporter("C:\\Users\\Rambo\\Documents\\Flashcards\\Great Works of Art__Artists2024.txt", "C:\\Users\\Rambo\\Documents\\Flashcards\\greatartists");
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("training-view.fxml"));
             VBox trainingView = loader.load();
@@ -63,27 +65,57 @@ public class FlashcardController {
 
     @FXML
     private void handleImportFiles() {
-        try {
-            // Importer et nyt deck
-            List<FlashcardDeck> importedDecks = importer.importFlashcardDecks();
-            FlashcardDeck newDeck = importedDecks.get(0); // Der er kun ét deck i listen
+        // Brug FileChooser til at vælge tekstfil
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+        fileChooser.setTitle("Open text File");
+        File selectedFile = fileChooser.showOpenDialog(new Stage());
 
-            // Tilføj flashcards til decket
-            System.out.println("Antal importerede kort: " + newDeck.getFlashcards().size());
+        // Hvis en fil er valgt
+        if (selectedFile != null) {
+            String filePath = selectedFile.getAbsolutePath();
+            System.out.println("Valgt fil: " + filePath);
 
-            // Importer billeder (hvis nødvendigt)
-            importer.importImages();
-            System.out.println("Billeder importeret.");
+            // Brug DirectoryChooser til at vælge billede-mappe
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Vælg billede mappe");
+            File selectedDirectory = directoryChooser.showDialog(new Stage());
 
-            // Kontroller, at trainingController er initialiseret
-            if (trainingController != null) {
-                trainingController.setFlashcardDeck(newDeck); // Send hele decket
-                System.out.println("Deck blev sendt til TrainingController.");
+            // Hvis en mappe er valgt
+            if (selectedDirectory != null) {
+                String imageDirectory = selectedDirectory.getAbsolutePath();
+                System.out.println("Valgt billede mappe: " + imageDirectory);
+
+                // Opret AnkiImporter med den valgte fil og billede-mappe
+                importer = new AnkiImporter(filePath, imageDirectory);
+
+                try {
+                    // Importer decks og billeder
+                    List<FlashcardDeck> importedDecks = importer.importFlashcardDecks();
+                    FlashcardDeck newDeck = importedDecks.get(0); // Der er kun ét deck i listen
+
+                    // Tilføj flashcards til decket
+                    System.out.println("Antal importerede kort: " + newDeck.getFlashcards().size());
+
+                    // Importer billeder (hvis nødvendigt)
+                    importer.importImages();
+                    System.out.println("Billeder importeret.");
+
+                    // Kontroller, at trainingController er initialiseret
+                    if (trainingController != null) {
+                        trainingController.setFlashcardDeck(newDeck); // Send hele decket
+                        System.out.println("Deck blev sendt til TrainingController.");
+                    } else {
+                        System.err.println("TrainingController er ikke blevet initialiseret korrekt.");
+                    }
+                } catch (IOException e) {
+                    showAlert("Fejl", "Der opstod en fejl under import af filer.", e.getMessage());
+                }
             } else {
-                System.err.println("TrainingController er ikke blevet initialiseret korrekt.");
+                System.out.println("Ingen billede-mappe valgt.");
             }
-        } catch (IOException e) {
-            showAlert("Fejl", "Der opstod en fejl under import af filer.", e.getMessage());
+        } else {
+            System.out.println("Ingen fil valgt.");
         }
     }
 

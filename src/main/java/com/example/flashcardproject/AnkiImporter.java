@@ -19,10 +19,8 @@ public class AnkiImporter {
     private String filePath;
     private String imageDirectory;
 
-    // Liste over decks
     private List<FlashcardDeck> decks;
 
-    // Konstruktør
     public AnkiImporter(String filePath, String imageDirectory) {
         this.filePath = filePath;
         this.imageDirectory = imageDirectory;
@@ -30,7 +28,7 @@ public class AnkiImporter {
     }
 
     public List<FlashcardDeck> importFlashcardDecks() throws IOException {
-        // Start med at oprette et enkelt deck, som vi vil bruge til at tilføje alle flashcards
+        // Start med at oprette et deck, som vi vil bruge til at tilføje alle flashcards
         FlashcardDeck deck = new FlashcardDeck("Great Works of Art");
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -39,7 +37,6 @@ public class AnkiImporter {
             while ((line = br.readLine()) != null) {
                 if (line.startsWith("#")) continue; // Spring metadata-linjer over
 
-                // Split linjen i kolonner
                 String[] columns = line.split("\t");
 
                 if (columns.length < 8) {
@@ -48,13 +45,12 @@ public class AnkiImporter {
                 }
 
                 try {
-                    // Udtræk relevante data
                     String imagePath = extractImagePath(columns[3]); // Billedsti
                     String question = cleanHtmlTags(columns[5]); // Spørgsmål
                     String answer = cleanHtmlTags(columns[4]); // Svar
                     String topic = columns[2].trim(); // Emne
 
-                    // Opret flashcard og tilføj til det samme deck
+                    // Opret flashcard og tilføj til decket
                     Flashcard flashcard = new Flashcard(question, answer, imagePath, topic, deck.getFlashcards().size());
                     deck.getFlashcards().add(flashcard);
 
@@ -69,38 +65,31 @@ public class AnkiImporter {
             throw e;
         }
 
-        // Returner en liste med ét deck, som indeholder alle flashcards
         List<FlashcardDeck> singleDeckList = new ArrayList<>();
         singleDeckList.add(deck);
         return singleDeckList;
     }
 
-    // Finder et deck baseret på navn eller opretter et nyt, hvis det ikke findes
     private FlashcardDeck findOrCreateDeck(String deckName) {
         for (FlashcardDeck deck : decks) {
             if (deck.getFlashcardDeckName().equalsIgnoreCase(deckName)) {
                 return deck;
             }
         }
-        // Opret et nyt deck, hvis det ikke findes
         FlashcardDeck newDeck = new FlashcardDeck(deckName);
-        newDeck.setFlashcards(new ArrayList<>()); // Initialiser flashcards-listen
+        newDeck.setFlashcards(new ArrayList<>());
         decks.add(newDeck);
         return newDeck;
     }
 
-    // Returner listen af decks
     public List<FlashcardDeck> getDecks() {
         return decks;
     }
 
-    // Metode til at importere billeder fra imageDirectory (kan udvides alt efter behov)
     public void importImages() {
-        // Her kan du tilføje logikken til at håndtere billederne, f.eks. ved at kopiere dem til den ønskede mappe
-        System.out.println("Billeder importeret fra: " + imageDirectory); // Eksempel på besked
+        System.out.println("Billeder importeret fra: " + imageDirectory);
     }
 
-    // Udtræk billedsti fra HTML (eksempel: <img src="path-to-image.jpg">)
     private static String extractImagePath(String html) {
         try {
             String cleanedHtml = html.replace("\"\"", "\"").trim();
@@ -115,7 +104,6 @@ public class AnkiImporter {
         return null;
     }
 
-    // Rens HTML-tags fra tekst
     public static String cleanHtmlTags(String input) {
         if (input == null) {
             return "";
