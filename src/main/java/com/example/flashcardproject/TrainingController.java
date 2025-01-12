@@ -1,13 +1,10 @@
 package com.example.flashcardproject;
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
-import java.util.List;
 
 public class TrainingController {
 
@@ -22,62 +19,71 @@ public class TrainingController {
     @FXML
     private Button nextCardButton;
 
-    private List<Flashcard> flashcards;  // Listen af flashcards
-    private int currentIndex = 0;        // Index til at holde styr på det aktuelle kort
+    private FlashcardDeck currentDeck;  // Decket, der arbejdes med
+    private int currentIndex = 0;
 
-    public void setFlashcards(List<Flashcard> flashcards) {
-        this.flashcards = flashcards;
-        showFlashcard(currentIndex);  // Vis det første kort
+    // Setter decket og viser det første kort
+    public void setFlashcardDeck(FlashcardDeck deck) {
+        if (deck == null || deck.getFlashcards().isEmpty()) {
+            System.err.println("Decket er tomt eller ikke initialiseret!");
+            return;
+        }
+        this.currentDeck = deck;
+        this.currentIndex = 0;  // Start ved første kort
+        showFlashcard(currentIndex);  // Vis første kort
     }
 
     @FXML
     private void handleShowAnswer() {
-        if (flashcards == null || flashcards.isEmpty()) {
-            System.err.println("Flashcards listen er tom eller ikke initialiseret!");
-            return; // Forhindrer, at der opstår en NullPointerException
+        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
+            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
+            return;
         }
 
-        Flashcard currentCard = flashcards.get(currentIndex);
-        answerLabel.setText(currentCard.getAnswer());  // Vist kunstnerens navn
-        showAnswerButton.setDisable(true);
+        Flashcard currentCard = currentDeck.getFlashcards().get(currentIndex);
+        answerLabel.setText(currentCard.getAnswer());
+        showAnswerButton.setDisable(true);  // Deaktiver knappen efter at svaret er vist
     }
 
     @FXML
     private void handleNextCard() {
-        if (flashcards == null || flashcards.isEmpty()) {
-            System.err.println("Flashcards listen er tom eller ikke initialiseret!");
-            return; // Forhindrer, at der opstår en NullPointerException
+        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
+            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
+            return;
         }
 
-        if (currentIndex < flashcards.size() - 1) {
+        // Tjek om vi er ved sidste kort, og vis det næste kort
+        if (currentIndex < currentDeck.getFlashcards().size() - 1) {
             currentIndex++;
             showFlashcard(currentIndex);
         } else {
             System.out.println("Der er ikke flere kort.");
+            nextCardButton.setDisable(true); // Deaktiver 'Next Card' knappen, når der ikke er flere kort
         }
     }
 
     private void showFlashcard(int index) {
-        if (flashcards == null || flashcards.isEmpty()) {
-            System.err.println("Flashcards listen er tom eller ikke initialiseret!");
-            return; // Forhindrer fejl
+        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
+            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
+            return;
         }
 
-        Flashcard currentCard = flashcards.get(index);
-        questionLabel.setText(currentCard.getQuestion());  // Vist maleriets titel
+        // Hent det aktuelle kort
+        Flashcard currentCard = currentDeck.getFlashcards().get(index);
+        questionLabel.setText(currentCard.getQuestion());  // Vis spørgsmålet (maleriets titel)
 
-        String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Tilpas denne sti
+        // Vis billede, hvis det er tilgængeligt
+        String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Juster til din billedmappe
         String imagePath = basePath + currentCard.getImagePath();
+
         if (imagePath != null && !imagePath.isEmpty()) {
-            Image image = new Image("file:" + imagePath);
+            Image image = new Image("file:" + imagePath);  // Sørg for at billedsti er korrekt
             questionImage.setImage(image);
-            System.out.println("image path: " + imagePath);
         } else {
-            questionImage.setImage(null);
-            System.out.println("image path is null");
+            questionImage.setImage(null);  // Ingen billede
         }
 
-        answerLabel.setText("Answer is shown here");
-        showAnswerButton.setDisable(false);
+        answerLabel.setText("Answer is shown here");  // Resæt svaret
+        showAnswerButton.setDisable(false);  // Aktivér "Vis svar"-knappen igen
     }
 }

@@ -15,7 +15,7 @@ public class Flashcard {
         this.index = index;
     }
 
-    // Getters og setters
+    // Getters & Setters
     public String getQuestion() {
         return question;
     }

@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FlashcardController {
@@ -17,26 +18,20 @@ public class FlashcardController {
     @FXML
     private BorderPane root;
 
-    // Reference til TrainingController for at opdatere flashcards
     @FXML
     private TrainingController trainingController;
 
+    private List<FlashcardDeck> decks = new ArrayList<>();
+
     @FXML
     private void initialize() {
-        // Initialiser AnkiImporter med de rette stier
         importer = new AnkiImporter("C:\\Users\\Rambo\\Documents\\Flashcards\\Great Works of Art__Artists2024.txt", "C:\\Users\\Rambo\\Documents\\Flashcards\\greatartists");
 
         try {
-            // Loader training-view.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("training-view.fxml"));
-            VBox trainingView = loader.load(); // Læs roden som VBox, da det er typen i FXML'en
-
-            // Tilføjer trainingView til midten af BorderPane
+            VBox trainingView = loader.load();
             root.setCenter(trainingView);
-
-            // Brug den allerede injicerede trainingController
             trainingController = loader.getController();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -66,22 +61,24 @@ public class FlashcardController {
         System.out.println("Again button clicked!");
     }
 
-    // Metode til at importere tekstfilen og billeder
     @FXML
     private void handleImportFiles() {
         try {
-            // Importer flashcards fra tekstfilen
-            List<Flashcard> flashcards = importer.importFlashcards();
-            System.out.println("Antal importerede kort: " + flashcards.size());
+            // Importer et nyt deck
+            List<FlashcardDeck> importedDecks = importer.importFlashcardDecks();
+            FlashcardDeck newDeck = importedDecks.get(0); // Der er kun ét deck i listen
 
-            // Importer billeder
+            // Tilføj flashcards til decket
+            System.out.println("Antal importerede kort: " + newDeck.getFlashcards().size());
+
+            // Importer billeder (hvis nødvendigt)
             importer.importImages();
             System.out.println("Billeder importeret.");
 
             // Kontroller, at trainingController er initialiseret
             if (trainingController != null) {
-                trainingController.setFlashcards(flashcards);
-                System.out.println("Flashcards blev sendt til TrainingController.");
+                trainingController.setFlashcardDeck(newDeck); // Send hele decket
+                System.out.println("Deck blev sendt til TrainingController.");
             } else {
                 System.err.println("TrainingController er ikke blevet initialiseret korrekt.");
             }
@@ -90,7 +87,6 @@ public class FlashcardController {
         }
     }
 
-    // Håndter fejl med en simpel Alert dialog
     private void showAlert(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
