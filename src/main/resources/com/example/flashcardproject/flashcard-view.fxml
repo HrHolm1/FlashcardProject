@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flashcardproject.FlashcardController">
@@ -14,7 +14,6 @@
                     <children>
                         <HBox alignment="CENTER" spacing="10.0">
                             <children>
-                                <Button mnemonicParsing="false" onAction="#handleImportFiles" text="Import" />
                                 <Button mnemonicParsing="false" onAction="#handleAgain" text="Again" />
                                 <Button mnemonicParsing="false" onAction="#handleHard" text="Hard" />
                                 <Button mnemonicParsing="false" onAction="#handleMedium" text="Medium" />
@@ -26,4 +25,17 @@
             </children>
         </HBox>
     </bottom>
+   <left>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button mnemonicParsing="false" text="Statistics" />
+            <Button mnemonicParsing="false" onAction="#handleImportFiles" text="Import Files" />
+            <Button mnemonicParsing="false" text="Custom Deck" />
+            <Button alignment="CENTER" mnemonicParsing="false" onAction="#helpWindow" text="Help &amp; Info" />
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <Region prefHeight="200.0" prefWidth="110.0" BorderPane.alignment="CENTER" />
+   </right>
 </BorderPane>

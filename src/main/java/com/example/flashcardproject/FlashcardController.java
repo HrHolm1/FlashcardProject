@@ -119,6 +119,20 @@ public class FlashcardController {
         }
     }
 
+    @FXML
+    private void helpWindow() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Help & Information");
+        alert.setHeaderText(null);
+        alert.setContentText("Below are 4 buttons, Again, Hard, Medium & Easy. " +
+                             "These buttons determine how often a given card is shown. " +
+                             "If you choose 'easy', then that card will appear later, " +
+                             "if you choose hard then that card will appear sooner. " +
+                             "Have fun !!! ");
+        alert.showAndWait();
+    }
+
+
     private void showAlert(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(title);
