@@ -11,6 +11,6 @@
       <Label fx:id="questionLabel" text="Question is shown here" />
       <Button fx:id="showAnswerButton" mnemonicParsing="false" onAction="#handleShowAnswer" text="Show Answer" />
       <Label fx:id="answerLabel" text="Answer is shown here" />
-      <Button fx:id="nextCardButton" mnemonicParsing="false" onAction="#handleNextCard" text="Next Card" />
+      <Button fx:id="nextCardButton" text="Next Card" onAction="#handleNextCard" />
    </children>
 </VBox>

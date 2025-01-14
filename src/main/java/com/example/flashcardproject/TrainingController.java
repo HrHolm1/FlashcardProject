@@ -19,18 +19,24 @@ public class TrainingController {
     @FXML
     private Button nextCardButton;
 
-    private FlashcardDeck currentDeck;  // Decket, der arbejdes med
-    private int currentIndex = 0;
+    private FlashcardDeck currentDeck;
+    private TrainingSession trainingSession;
+    private int currentIndex;
 
-    // Setter decket og viser det første kort
+    public TrainingController() {
+        trainingSession = new TrainingSession();  // Initialiser TrainingSession
+    }
+
+    // Sætter decket og starter sessionen
     public void setFlashcardDeck(FlashcardDeck deck) {
         if (deck == null || deck.getFlashcards().isEmpty()) {
             System.err.println("Decket er tomt eller ikke initialiseret!");
             return;
         }
         this.currentDeck = deck;
-        this.currentIndex = 0;  // Start ved første kort
-        showFlashcard(currentIndex);  // Vis første kort
+        trainingSession.startSession(deck);  // Start sessionen med det importerede deck
+        currentIndex = 0;  // Sæt startindeks
+        showNextCard();  // Vis første kort
     }
 
     @FXML
@@ -40,9 +46,10 @@ public class TrainingController {
             return;
         }
 
+        // Find det nuværende kort
         Flashcard currentCard = currentDeck.getFlashcards().get(currentIndex);
         answerLabel.setText(currentCard.getAnswer());
-        showAnswerButton.setDisable(true);  // Deaktiver knappen efter at svaret er vist
+        showAnswerButton.setDisable(true);  // Deaktiver knappen efter visning af svar
     }
 
     @FXML
@@ -52,38 +59,55 @@ public class TrainingController {
             return;
         }
 
-        // Tjek om vi er ved sidste kort, og vis det næste kort
-        if (currentIndex < currentDeck.getFlashcards().size() - 1) {
-            currentIndex++;
-            showFlashcard(currentIndex);
-        } else {
-            System.out.println("Der er ikke flere kort.");
-            nextCardButton.setDisable(true); // Deaktiver 'Next Card' knappen, når der ikke er flere kort
-        }
-    }
-
-    private void showFlashcard(int index) {
-        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
-            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
+        // Hvis der er et "Again"-kort, vis det først
+        if (trainingSession.hasPendingAgainCard()) {
+            currentIndex = trainingSession.getAgainCardIndex();
+            showNextCard();
             return;
         }
 
-        // Hent det aktuelle kort
-        Flashcard currentCard = currentDeck.getFlashcards().get(index);
-        questionLabel.setText(currentCard.getQuestion());  // Vis spørgsmålet (maleriets titel)
-
-        // Vis billede, hvis det er tilgængeligt
-        String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Juster til din billedmappe
-        String imagePath = basePath + currentCard.getImagePath();
-
-        if (imagePath != null && !imagePath.isEmpty()) {
-            Image image = new Image("file:" + imagePath);  // Sørg for at billedsti er korrekt
-            questionImage.setImage(image);
-        } else {
-            questionImage.setImage(null);  // Ingen billede
+        // Ellers fortsæt til næste kort i rækkefølgen
+        currentIndex++;
+        if (currentIndex >= currentDeck.getFlashcards().size()) {
+            currentIndex = 0; // Loop tilbage til starten
         }
 
-        answerLabel.setText("Answer is shown here");  // Resæt svaret
-        showAnswerButton.setDisable(false);  // Aktivér "Vis svar"-knappen igen
+        showNextCard();
+    }
+
+
+    public void updateDeckOrder(String answerType) {
+        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
+            System.err.println("Deck er tomt eller ikke initialiseret.");
+            return;
+        }
+
+        // Find det nuværende kort og opdater rækkefølgen
+        Flashcard currentCard = currentDeck.getFlashcards().get(currentIndex);
+        trainingSession.updateDeckOrder(currentCard, answerType);  // Opdater rækkefølgen uden at vise næste kort
+    }
+
+    // Denne metode viser det næste kort på skærmen
+    private void showNextCard() {
+        if (currentIndex < currentDeck.getFlashcards().size()) {
+            Flashcard nextCard = currentDeck.getFlashcards().get(currentIndex);
+            questionLabel.setText(nextCard.getQuestion());
+
+            String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";
+            String imagePath = basePath + nextCard.getImagePath();
+
+            if (imagePath != null && !imagePath.isEmpty()) {
+                Image image = new Image("file:" + imagePath);
+                questionImage.setImage(image);
+            } else {
+                questionImage.setImage(null);
+            }
+
+            answerLabel.setText("Answer is shown here");
+            showAnswerButton.setDisable(false);
+        } else {
+            System.out.println("Der er ikke flere kort.");
+            nextCardButton.setDisable(true); // Deaktiver knappen, hvis der ikke er flere kort
+        }
     }
 }

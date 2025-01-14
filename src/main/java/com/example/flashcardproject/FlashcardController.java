@@ -43,24 +43,34 @@ public class FlashcardController {
     private void handleEasy() {
         statistics.answerStatistics("Easy");
         System.out.println("Easy button clicked!");
+        updateTrainingController("Easy");
     }
 
     @FXML
     private void handleMedium() {
         statistics.answerStatistics("Medium");
         System.out.println("Medium button clicked!");
+        updateTrainingController("Medium");
     }
 
     @FXML
     private void handleHard() {
         statistics.answerStatistics("Hard");
         System.out.println("Hard button clicked!");
+        updateTrainingController("Hard");
     }
 
     @FXML
     private void handleAgain() {
         statistics.answerStatistics("Again");
         System.out.println("Again button clicked!");
+        updateTrainingController("Again");
+    }
+
+    private void updateTrainingController(String answerType) {
+        if (trainingController != null) {
+            trainingController.updateDeckOrder(answerType);  // Opdater deckrækkefølgen i TrainingController
+        }
     }
 
     @FXML
@@ -125,13 +135,12 @@ public class FlashcardController {
         alert.setTitle("Help & Information");
         alert.setHeaderText(null);
         alert.setContentText("Below are 4 buttons, Again, Hard, Medium & Easy. " +
-                             "These buttons determine how often a given card is shown. " +
-                             "If you choose 'easy', then that card will appear later, " +
-                             "if you choose hard then that card will appear sooner. " +
-                             "Have fun !!! ");
+                "These buttons determine how often a given card is shown. " +
+                "If you choose 'easy', then that card will appear later, " +
+                "if you choose hard then that card will appear sooner. " +
+                "Have fun !!! ");
         alert.showAndWait();
     }
-
 
     private void showAlert(String title, String header, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
