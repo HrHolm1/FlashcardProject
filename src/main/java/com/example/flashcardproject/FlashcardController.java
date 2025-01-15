@@ -61,10 +61,12 @@ public class FlashcardController {
     }
 
     @FXML
-    private void handleAgain() {
-        statistics.answerStatistics("Again");
-        System.out.println("Again button clicked!");
-        updateTrainingController("Again");
+    private void handleLearned() {
+        statistics.answerStatistics("Learned");
+        System.out.println("Learned button clicked!");
+
+        // Videregiv svaret til TrainingController for at opdatere rækkefølgen
+        updateTrainingController("Learned");
     }
 
     private void updateTrainingController(String answerType) {

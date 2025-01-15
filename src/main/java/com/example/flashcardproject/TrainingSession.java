@@ -3,9 +3,7 @@ package com.example.flashcardproject;
 public class TrainingSession {
 
     private FlashcardDeck currentDeck;
-    private Flashcard lastAgainCard;  // Variabel til at gemme det kort, der blev valgt til "Again"
 
-    // Starter sessionen med det deck, som brugeren har importeret
     public void startSession(FlashcardDeck deck) {
         if (deck == null || deck.getFlashcards().isEmpty()) {
             System.err.println("Decket er tomt eller ikke initialiseret!");
@@ -14,80 +12,70 @@ public class TrainingSession {
         this.currentDeck = deck;
     }
 
-    private int againCardIndex = -1; // Husk indekset for det sidst valgte "Again"-kort
-
     public void updateDeckOrder(Flashcard currentCard, String answerType) {
         if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
             System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
             return;
         }
 
+        // Fjern det aktuelle kort fra listen
         int currentIndex = currentCard.getIndex();
         currentDeck.getFlashcards().remove(currentCard);
 
-        int newIndex = -1;
+        // Beregn den nye placering baseret på svar
+        int newIndex = 0; // Bruges kun til ikke-"Learned" svar
         switch (answerType) {
-            case "Again":
-                // "Again" kortet skal vises først, så flyt det til starten
-                newIndex = 0;
-                againCardIndex = newIndex; // Husk det som "Again"-kort
-                break;
-
             case "Hard":
-                // "Hard" kortet skal vises hurtigere, så flyt det 3 pladser frem
                 newIndex = Math.max(0, currentIndex + 3);
                 break;
-
             case "Medium":
-                // "Medium" kortet skal vises lidt senere, så flyt det 6 pladser frem
                 newIndex = Math.min(currentDeck.getFlashcards().size(), currentIndex + 6);
                 break;
-
             case "Easy":
-                // "Easy" kortet skal vises senere, så flyt det 10 pladser frem
                 newIndex = Math.min(currentDeck.getFlashcards().size(), currentIndex + 10);
                 break;
-
+            case "Learned":
+                // Kortet fjernes permanent fra decket
+                System.out.println("Kortet er markeret som lært og fjernet permanent.");
+                break;
             default:
                 System.err.println("Ukendt svarmulighed: " + answerType);
                 return;
         }
 
-        // Tilføj kortet til den nye position i decket
-        currentDeck.getFlashcards().add(newIndex, currentCard);
-
-        // Opdater indekserne for alle kort
-        for (int i = 0; i < currentDeck.getFlashcards().size(); i++) {
-            currentDeck.getFlashcards().get(i).setIndex(i);
+        // Tilføj kortet til den nye position, hvis det ikke er "Learned"
+        if (!"Learned".equals(answerType)) {
+            currentDeck.getFlashcards().add(newIndex, currentCard);
         }
 
-        System.out.println("Kortet er flyttet til indeks: " + newIndex);
+        // Opdater indekserne på alle kort
+        for (int i = 0; i < currentDeck.getFlashcards().size(); i++) {
+            Flashcard card = currentDeck.getFlashcards().get(i);
+            card.setIndex(i); // Opdater index på hvert kort
+        }
+
+        if (!"Learned".equals(answerType)) {
+            System.out.println("Kortet er flyttet til indeks: " + newIndex);
+        }
     }
 
-    public boolean hasPendingAgainCard() {
-        return againCardIndex != -1;
-    }
-
-    public int getAgainCardIndex() {
-        return againCardIndex;
-    }
-
-
-    public Flashcard getNextCard() {
+    public Flashcard getNextCard(int currentIndex) {
         if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
             System.err.println("Decket er tomt eller ikke initialiseret!");
             return null;
         }
 
-        // Find kortet med det mindste indeks, der ikke er blevet gennemgået
-        for (Flashcard card : currentDeck.getFlashcards()) {
-            if (card.getIndex() > -1) { // Check at kortet stadig har et gyldigt indeks
-                return card;
-            }
+        // Debug: Tjek currentIndex og deck størrelse
+        System.out.println("Current Index i getNextCard: " + currentIndex);
+
+        // Returner det næste kort i rækkefølgen
+        if (currentIndex < currentDeck.getFlashcards().size() - 1) {
+            System.out.println("Returnerer næste kort: " + (currentIndex + 1));
+            return currentDeck.getFlashcards().get(currentIndex + 1);
         }
 
-        System.out.println("Der er ikke flere kort.");
-        return null;
+        // Hvis vi når slutningen, loop tilbage til starten
+        System.out.println("Loop tilbage til start.");
+        return currentDeck.getFlashcards().get(0);
     }
-
 }

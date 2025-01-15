@@ -8,7 +8,7 @@ public class Statistics {
 
     private int almostCorrectAnswersCount; // Counter for almost correct answers, corresponds to the "Hard" button.
 
-    private int incorrectAnswersCount; // Counter for incorrect answers, corresponds to the "Again" button.
+    private int learnedAnswersCount; // Counter for incorrect answers, corresponds to the "Again" button.
 
     private int getCorrectAnswersCount() {
         return correctAnswersCount;
@@ -34,12 +34,12 @@ public class Statistics {
         this.almostCorrectAnswersCount = almostCorrectAnswersCount;
     }
 
-    private int getIncorrectAnswersCount() {
-        return incorrectAnswersCount;
+    private int getLearnedAnswersCount() {
+        return learnedAnswersCount;
     }
 
-    private void setIncorrectAnswersCount(int incorrectAnswersCount){
-        this.incorrectAnswersCount = incorrectAnswersCount;
+    private void learnedAnswersCount(int incorrectAnswersCount){
+        this.learnedAnswersCount = incorrectAnswersCount;
     }
 
     public void answerStatistics(String answerOption) {
@@ -53,8 +53,8 @@ public class Statistics {
             case "hard":
                 almostCorrectAnswersCount++;
                 break;
-            case "again":
-                incorrectAnswersCount++;
+            case "learned":
+                learnedAnswersCount++;
                 break;
             default:
                 System.out.println("Invalid answer option: " + answerOption);
