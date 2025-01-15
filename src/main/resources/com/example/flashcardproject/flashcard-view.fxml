@@ -28,7 +28,7 @@
    <left>
       <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0" BorderPane.alignment="CENTER">
          <children>
-            <Button mnemonicParsing="false" text="Statistics" />
+            <Button mnemonicParsing="false" onAction="#statisticsWindow" text="Statistics" />
             <Button mnemonicParsing="false" onAction="#handleImportFiles" text="Import Files" />
             <Button mnemonicParsing="false" text="Custom Deck" />
             <Button alignment="CENTER" mnemonicParsing="false" onAction="#helpWindow" text="Help &amp; Info" />

@@ -10,7 +10,7 @@ public class Statistics {
 
     private int learnedAnswersCount; // Counter for incorrect answers, corresponds to the "Again" button.
 
-    private int getCorrectAnswersCount() {
+    int getCorrectAnswersCount() {
         return correctAnswersCount;
     }
 
@@ -18,7 +18,7 @@ public class Statistics {
         this.correctAnswersCount = correctAnswersCount;
     }
 
-    private int getPartiallyCorrectAnswersCount() {
+    int getPartiallyCorrectAnswersCount() {
         return partiallyCorrectAnswersCount;
     }
 
@@ -26,7 +26,7 @@ public class Statistics {
         this.partiallyCorrectAnswersCount = partiallyCorrectAnswersCount;
     }
 
-    private int getAlmostCorrectAnswersCount() {
+    int getAlmostCorrectAnswersCount() {
         return almostCorrectAnswersCount;
     }
 
@@ -34,7 +34,7 @@ public class Statistics {
         this.almostCorrectAnswersCount = almostCorrectAnswersCount;
     }
 
-    private int getLearnedAnswersCount() {
+    int getLearnedAnswersCount() {
         return learnedAnswersCount;
     }
 

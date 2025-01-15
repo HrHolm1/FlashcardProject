@@ -11,7 +11,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class FlashcardController {
@@ -24,8 +23,6 @@ public class FlashcardController {
 
     @FXML
     private TrainingController trainingController;
-
-    private List<FlashcardDeck> decks = new ArrayList<>();
 
     @FXML
     private void initialize() {
@@ -136,10 +133,11 @@ public class FlashcardController {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Help & Information");
         alert.setHeaderText(null);
-        alert.setContentText("Below are 4 buttons, Again, Hard, Medium & Easy. " +
+        alert.setContentText("Below are 4 buttons, Learned, Hard, Medium & Easy. " +
                 "These buttons determine how often a given card is shown. " +
                 "If you choose 'easy', then that card will appear later, " +
                 "if you choose hard then that card will appear sooner. " +
+                "TAKE NOTE, 'LEARNED' REMOVES THE CARD. " +
                 "Have fun !!! ");
         alert.showAndWait();
     }
@@ -151,4 +149,31 @@ public class FlashcardController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    @FXML
+    private void statisticsWindow() {
+        // Opret en Alert af typen INFORMATION
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Player Statistics");
+        alert.setHeaderText("Your Current Statistics");
+
+        // Byg indholdsteksten baseret på statistikværdier
+        String statisticsContent = String.format(
+                "Easy answers: %d%n" +
+                        "Medium answers: %d%n" +
+                        "Hard answers: %d%n" +
+                        "Learned cards: %d%n",
+                statistics.getCorrectAnswersCount(),         // Hent antal korrekte svar (Easy)
+                statistics.getPartiallyCorrectAnswersCount(), // Hent antal delvist korrekte svar (Medium)
+                statistics.getAlmostCorrectAnswersCount(),   // Hent antal næsten korrekte svar (Hard)
+                statistics.getLearnedAnswersCount()          // Hent antal lærte kort (Learned)
+        );
+
+        // Sæt indholdet af alert-boksen
+        alert.setContentText(statisticsContent);
+
+        // Vis vinduet og vent på brugerens interaktion
+        alert.showAndWait();
+    }
+
 }
