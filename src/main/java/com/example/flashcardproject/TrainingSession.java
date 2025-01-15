@@ -3,6 +3,7 @@ package com.example.flashcardproject;
 public class TrainingSession {
 
     private FlashcardDeck currentDeck;
+    private int totalCardsLeft; // Antal kort tilbage i decket
 
     public void startSession(FlashcardDeck deck) {
         if (deck == null || deck.getFlashcards().isEmpty()) {
@@ -10,6 +11,7 @@ public class TrainingSession {
             return;
         }
         this.currentDeck = deck;
+        this.totalCardsLeft = deck.getFlashcards().size(); // Initialiser totalCardsLeft
     }
 
     public void updateDeckOrder(Flashcard currentCard, String answerType) {
@@ -78,4 +80,22 @@ public class TrainingSession {
         System.out.println("Loop tilbage til start.");
         return currentDeck.getFlashcards().get(0);
     }
+
+    public int getTotalCardsLeft() {
+        // Returner antallet af kort tilbage
+        return totalCardsLeft;
+    }
+
+    public void recalculateTotalCardsLeft() {
+        // Sørg for, at totalCardsLeft altid er synkroniseret med deckets faktiske størrelse
+        if (currentDeck != null) {
+            this.totalCardsLeft = currentDeck.getFlashcards().size();
+        } else {
+            this.totalCardsLeft = 0;
+        }
+    }
+
+
+
+
 }

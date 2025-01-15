@@ -18,6 +18,9 @@ public class TrainingController {
     private Button showAnswerButton;
     @FXML
     private Button nextCardButton;
+    @FXML
+    private Label totalCardsLeftLabel;
+
 
     private FlashcardDeck currentDeck;
     private TrainingSession trainingSession;
@@ -37,6 +40,7 @@ public class TrainingController {
         trainingSession.startSession(deck);
         currentIndex = 0;  // Sæt indekset korrekt
         showNextCard();  // Vis det første kort
+        updateTotalCardsLeftLabel();  // Opdater labelen med antallet af kort
     }
 
     @FXML
@@ -70,6 +74,8 @@ public class TrainingController {
             System.out.println("Der er ikke flere kort.");
             nextCardButton.setDisable(true);  // Deaktiver knappen, hvis der ikke er flere kort
         }
+
+        updateTotalCardsLeftLabel();  // Opdater korttællingens label
     }
 
     public void updateDeckOrder(String answerType) {
@@ -80,6 +86,7 @@ public class TrainingController {
 
         // Vis feedback for, at rækkefølgen blev opdateret
         System.out.println("Rækkefølgen opdateret med svar: " + answerType);
+        updateTotalCardsLeftLabel();  // Opdater korttællingens label
     }
 
     private void showNextCard() {
@@ -94,7 +101,7 @@ public class TrainingController {
         if (currentCard != null) {
             questionLabel.setText(currentCard.getQuestion());
 
-            String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";
+            String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Opdater denne sti efter behov
             String imagePath = basePath + currentCard.getImagePath();
 
             if (imagePath != null && !imagePath.isEmpty()) {
@@ -112,5 +119,10 @@ public class TrainingController {
             nextCardButton.setDisable(true); // Deaktiver knappen, hvis der ikke er flere kort
         }
     }
-}
 
+    private void updateTotalCardsLeftLabel() {
+        // Opdater totalCardsLeftLabel med antallet af kort tilbage
+        trainingSession.recalculateTotalCardsLeft();  // Sørg for at få den nyeste tælling
+        totalCardsLeftLabel.setText("Cards Left: " + trainingSession.getTotalCardsLeft());
+    }
+}
