@@ -66,7 +66,7 @@ public class CreateDeckController {
 
         // Tilføj flashcard til deck
         int index = customDeck.getFlashcards().size();  // Indeks er rækkefølgen
-        Flashcard newCard = new Flashcard(question, answer, topic, imagePath, index);
+        Flashcard newCard = new Flashcard(question, answer, imagePath, topic, index);
         customDeck.addFlashcard(newCard);
 
         // Ryd felterne for at tilføje flere kort
@@ -85,7 +85,9 @@ public class CreateDeckController {
             return;
         }
 
-        // Gem decket i en fælles struktur (eller database)
+        // Tilføj decket til DeckManager
+        DeckManager.getInstance().addDeck(customDeck);
+
         System.out.println("Deck saved: " + customDeck.getFlashcardDeckName());
         System.out.println("Total cards: " + customDeck.getFlashcards().size());
 

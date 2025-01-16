@@ -101,15 +101,11 @@ public class TrainingController {
         if (currentCard != null) {
             questionLabel.setText(currentCard.getQuestion());
 
-            String basePath = "C:/Users/Rambo/Documents/Flashcards/greatartists/";  // Opdater denne sti efter behov
-            String imagePath = basePath + currentCard.getImagePath();
+            String imagePath = currentCard.getFullImagePath();
+            Image image = new Image("file:" + imagePath);
+            questionImage.setImage(image);
 
-            if (imagePath != null && !imagePath.isEmpty()) {
-                Image image = new Image("file:" + imagePath);
-                questionImage.setImage(image);
-            } else {
-                questionImage.setImage(null);
-            }
+            System.out.println("Image Path: " + imagePath); // Debug output
 
             answerLabel.setText("Answer is shown here");
             showAnswerButton.setDisable(false);  // Aktiver knappen

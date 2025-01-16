@@ -65,25 +65,11 @@ public class AnkiImporter {
             throw e;
         }
 
+        DeckManager.getInstance().addDeck(deck);
+
         List<FlashcardDeck> singleDeckList = new ArrayList<>();
         singleDeckList.add(deck);
         return singleDeckList;
-    }
-
-    private FlashcardDeck findOrCreateDeck(String deckName) {
-        for (FlashcardDeck deck : decks) {
-            if (deck.getFlashcardDeckName().equalsIgnoreCase(deckName)) {
-                return deck;
-            }
-        }
-        FlashcardDeck newDeck = new FlashcardDeck(deckName);
-        newDeck.setFlashcards(new ArrayList<>());
-        decks.add(newDeck);
-        return newDeck;
-    }
-
-    public List<FlashcardDeck> getDecks() {
-        return decks;
     }
 
     public void importImages() {

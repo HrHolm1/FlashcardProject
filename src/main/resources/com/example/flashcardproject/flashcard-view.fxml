@@ -31,6 +31,7 @@
             <Button mnemonicParsing="false" onAction="#statisticsWindow" text="Statistics" />
             <Button mnemonicParsing="false" onAction="#handleImportFiles" text="Import Files" />
             <Button mnemonicParsing="false" onAction="#handleCreateDeck" text="Custom Deck" />
+            <Button mnemonicParsing="false" onAction="#handleChooseDeck" text="Choose Deck" />
             <Button alignment="CENTER" mnemonicParsing="false" onAction="#helpWindow" text="Help &amp; Info" />
          </children>
       </VBox>

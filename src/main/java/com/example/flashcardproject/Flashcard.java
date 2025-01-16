@@ -1,5 +1,7 @@
 package com.example.flashcardproject;
 
+import java.io.File;
+
 public class Flashcard {
     private String question; // Titel på maleriet (spørgsmålet)
     private String answer;   // Kunstnerens navn (svaret)
@@ -55,4 +57,13 @@ public class Flashcard {
     public void setIndex(int index) {
         this.index = index;
     }
+
+    public String getFullImagePath() {
+        if (new File(imagePath).isAbsolute()) {
+            return imagePath;
+        } else {
+            return "C:/Users/Rambo/Documents/Flashcards/greatartists/" + imagePath;
+        }
+    }
+
 }
