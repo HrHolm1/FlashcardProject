@@ -31,7 +31,6 @@ public class ChooseDeckController {
 
     @FXML
     private void handlePlayDeck() {
-        // Tjek om brugeren har valgt et deck
         String selectedDeckName = deckListView.getSelectionModel().getSelectedItem();
         if (selectedDeckName == null) {
             showAlert("No Deck Selected", "Please select a deck to play.");
@@ -40,29 +39,26 @@ public class ChooseDeckController {
 
         // Hent det valgte deck fra DeckManager
         FlashcardDeck selectedDeck = DeckManager.getInstance().getDeckByName(selectedDeckName);
-
-        if (selectedDeck == null) {
+        if (selectedDeck == null || selectedDeck.getFlashcards().isEmpty()) {
             showAlert("Deck Not Found", "The selected deck could not be found.");
             return;
         }
 
-        // Start spillet med det valgte deck
+        // Start træningssessionen
         startTrainingSession(selectedDeck);
     }
 
     private void startTrainingSession(FlashcardDeck deck) {
         try {
-            // Opret en ny view til træning
             FXMLLoader loader = new FXMLLoader(getClass().getResource("training-view.fxml"));
             VBox trainingView = loader.load();
             TrainingController trainingController = loader.getController();
 
-            // Send det valgte deck til TrainingController
+            // Overfør decket til TrainingController
             trainingController.setFlashcardDeck(deck);
 
-            // Find root layout og opdater kun centerområdet
             BorderPane root = (BorderPane) deckListView.getScene().getRoot();
-            root.setCenter(trainingView); // Skift kun centerområdet, så resten af UI'et bliver
+            root.setCenter(trainingView); // Beholder resten af layoutet
 
         } catch (IOException e) {
             e.printStackTrace();

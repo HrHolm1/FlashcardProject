@@ -5,13 +5,14 @@ public class TrainingSession {
     private FlashcardDeck currentDeck;
     private int totalCardsLeft; // Antal kort tilbage i decket
 
-    public void startSession(FlashcardDeck deck) {
+    public void startSession(String deckName) {
+        FlashcardDeck deck = DeckManager.getInstance().getDeckByName(deckName);
         if (deck == null || deck.getFlashcards().isEmpty()) {
-            System.err.println("Decket er tomt eller ikke initialiseret!");
+            System.err.println("Deck not found or is empty!");
             return;
         }
         this.currentDeck = deck;
-        this.totalCardsLeft = deck.getFlashcards().size(); // Initialiser totalCardsLeft
+        this.totalCardsLeft = deck.getFlashcards().size();
     }
 
     public void updateDeckOrder(Flashcard currentCard, String answerType) {
@@ -94,6 +95,4 @@ public class TrainingSession {
             this.totalCardsLeft = 0;
         }
     }
-
-
 }

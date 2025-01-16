@@ -31,13 +31,21 @@ public class TrainingController {
         trainingSession = new TrainingSession(); // Initialiser TrainingSession
     }
 
+    public void setTrainingSession(TrainingSession trainingSession) {
+        this.trainingSession = trainingSession;
+    }
+
     public void setFlashcardDeck(FlashcardDeck deck) {
         if (deck == null || deck.getFlashcards().isEmpty()) {
             System.err.println("Decket er tomt eller ikke initialiseret!");
             return;
         }
         this.currentDeck = deck;
-        trainingSession.startSession(deck);
+
+        // Start træningssessionen ved at hente decknavnet fra FlashcardDeck
+        String deckName = deck.getFlashcardDeckName();
+        trainingSession.startSession(deckName); // Brug decknavnet i stedet for hele decket
+
         currentIndex = 0;  // Sæt indekset korrekt
         showNextCard();  // Vis det første kort
         updateTotalCardsLeftLabel();  // Opdater labelen med antallet af kort
