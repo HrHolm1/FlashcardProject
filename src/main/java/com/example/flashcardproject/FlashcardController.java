@@ -73,6 +73,19 @@ public class FlashcardController {
     }
 
     @FXML
+    private void handleCreateDeck() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("create-deck-view.fxml"));
+            VBox createDeckView = loader.load();
+
+            // Vis skærmen til oprettelse af decks
+            root.setCenter(createDeckView);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleImportFiles() {
         // Brug FileChooser til at vælge tekstfil
         FileChooser fileChooser = new FileChooser();
