@@ -1,98 +1,144 @@
 package com.example.flashcardproject;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.LinkedList;
+import java.util.Queue;
+
 public class TrainingSession {
 
     private FlashcardDeck currentDeck;
-    private int totalCardsLeft; // Antal kort tilbage i decket
+    private int totalCardsLeft;
+    private int currentIndex;
+    private Map<String, Integer> deckProgressMap = new HashMap<>();
+    private Queue<Flashcard> flashcardQueue = new LinkedList<>();
+
+    private static TrainingSession instance; // Singleton-instans
+
+    private TrainingSession() {
+        // Privat konstruktor for at forhindre direkte instansiering
+    }
+
+    public static TrainingSession getInstance() {
+        if (instance == null) {
+            instance = new TrainingSession();
+        }
+        return instance;
+    }
 
     public void startSession(String deckName) {
+        System.out.println("TrainingSession instance: " + this);
         FlashcardDeck deck = DeckManager.getInstance().getDeckByName(deckName);
         if (deck == null || deck.getFlashcards().isEmpty()) {
-            System.err.println("Deck not found or is empty!");
+            System.err.println("Deck not found or is empty for deck name: " + deckName);
             return;
         }
         this.currentDeck = deck;
-        this.totalCardsLeft = deck.getFlashcards().size();
+        flashcardQueue.clear();
+        flashcardQueue.addAll(deck.getFlashcards());
+        System.out.println("Session started for deck: " + currentDeck.getFlashcardDeckName());
     }
+
 
     public void updateDeckOrder(Flashcard currentCard, String answerType) {
-        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
-            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
-            return;
+        System.out.println("TrainingSession instance: " + this);
+        System.out.println("CurrentDeck: " + (currentDeck != null ? currentDeck.getFlashcardDeckName() : "null"));
+
+        if (currentDeck == null) {
+            System.err.println("Error: currentDeck er null i TrainingSession.updateDeckOrder.");
+            return; // Stop hvis currentDeck ikke findes
         }
 
-        // Fjern det aktuelle kort fra listen
-        int currentIndex = currentCard.getIndex();
-        currentDeck.getFlashcards().remove(currentCard);
+        // Håndtering af forskellige svartyper
+        if (answerType.equals("Learned")) {
+            removeCardFromDeck(currentCard);
+            System.out.println("Card marked as learned and removed from session: " + currentCard.getQuestion());
+        } else {
+            int originalIndex = currentDeck.getFlashcards().indexOf(currentCard);
+            if (originalIndex == -1) {
+                System.err.println("Error: Kortet blev ikke fundet i decket.");
+                return;
+            }
 
-        // Beregn den nye placering baseret på svar
-        int newIndex = 0; // Bruges kun til ikke-"Learned" svar
+            int newIndex = calculateNewIndex(originalIndex, answerType);
+            if (originalIndex != newIndex) {
+                currentDeck.getFlashcards().remove(currentCard);
+                currentDeck.getFlashcards().add(newIndex, currentCard);
+                System.out.println("Card moved to new index: " + newIndex);
+            }
+            updateIndexes();
+        }
+
+        // Opdater køen, efter ændringer er foretaget
+        updateFlashcardQueue();
+    }
+
+
+    private void updateFlashcardQueue() {
+        // Tøm køen og tilføj alle kortene i den nye rækkefølge
+        flashcardQueue.clear();
+        flashcardQueue.addAll(currentDeck.getFlashcards());
+        System.out.println("Flashcard queue updated: " + flashcardQueue.size() + " cards in queue.");
+    }
+
+    private int calculateNewIndex(int originalIndex, String answerType) {
         switch (answerType) {
             case "Hard":
-                newIndex = Math.max(0, currentIndex + 3);
-                break;
+                return Math.max(0, originalIndex + 3);  // Kortet skal vises stort set efter
             case "Medium":
-                newIndex = Math.min(currentDeck.getFlashcards().size(), currentIndex + 6);
-                break;
+                return Math.max(0, originalIndex + 6);  // Kortet skal vises lidt en smule senere
             case "Easy":
-                newIndex = Math.min(currentDeck.getFlashcards().size(), currentIndex + 10);
-                break;
-            case "Learned":
-                // Kortet fjernes permanent fra decket
-                System.out.println("Kortet er markeret som lært og fjernet permanent.");
-                break;
+                return Math.min(currentDeck.getFlashcards().size(), originalIndex + 10);  // Kortet skal vises senere
             default:
-                System.err.println("Ukendt svarmulighed: " + answerType);
-                return;
-        }
-
-        // Tilføj kortet til den nye position, hvis det ikke er "Learned"
-        if (!"Learned".equals(answerType)) {
-            currentDeck.getFlashcards().add(newIndex, currentCard);
-        }
-
-        // Opdater indekserne på alle kort
-        for (int i = 0; i < currentDeck.getFlashcards().size(); i++) {
-            Flashcard card = currentDeck.getFlashcards().get(i);
-            card.setIndex(i); // Opdater index på hvert kort
-        }
-
-        if (!"Learned".equals(answerType)) {
-            System.out.println("Kortet er flyttet til indeks: " + newIndex);
+                return originalIndex;
         }
     }
 
-    public Flashcard getNextCard(int currentIndex) {
-        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
-            System.err.println("Decket er tomt eller ikke initialiseret!");
-            return null;
+    private void updateIndexes() {
+        for (int i = 0; i < currentDeck.getFlashcards().size(); i++) {
+            currentDeck.getFlashcards().get(i).setIndex(i);  // Opdater indexet for hvert kort
+        }
+    }
+
+    private void removeCardFromDeck(Flashcard card) {
+        // Fjern kortet fra både decket og køen
+        if (currentDeck.getFlashcards().remove(card)) {
+            flashcardQueue.remove(card);  // Fjern det fra køen
+            updateIndexes();  // Opdater indekserne efter at kortet er blevet fjernet
         }
 
-        // Debug: Tjek currentIndex og deck størrelse
-        System.out.println("Current Index i getNextCard: " + currentIndex);
+        // Efter fjernelse opdater køen baseret på det ændrede deck
+        updateFlashcardQueue();
+    }
 
-        // Returner det næste kort i rækkefølgen
-        if (currentIndex < currentDeck.getFlashcards().size() - 1) {
-            System.out.println("Returnerer næste kort: " + (currentIndex + 1));
-            return currentDeck.getFlashcards().get(currentIndex + 1);
-        }
+    public Flashcard getNextCard() {
+        return flashcardQueue.poll(); // Returner og fjern det første kort i køen (FIFO)
+    }
 
-        // Hvis vi når slutningen, loop tilbage til starten
-        System.out.println("Loop tilbage til start.");
-        return currentDeck.getFlashcards().get(0);
+    public void saveProgress(String deckName) {
+        // Gem den nuværende position baseret på køens størrelse
+        int cardsLeft = flashcardQueue.size();
+        deckProgressMap.put(deckName, cardsLeft);
+        System.out.println("Progress saved for deck " + deckName + " with " + cardsLeft + " cards left.");
     }
 
     public int getTotalCardsLeft() {
-        // Returner antallet af kort tilbage
-        return totalCardsLeft;
+        return flashcardQueue.size();
     }
 
     public void recalculateTotalCardsLeft() {
-        // Sørg for, at totalCardsLeft altid er synkroniseret med deckets faktiske størrelse
-        if (currentDeck != null) {
-            this.totalCardsLeft = currentDeck.getFlashcards().size();
-        } else {
-            this.totalCardsLeft = 0;
+        if (flashcardQueue == null) {
+            System.err.println("flashcardQueue er null i recalculateTotalCardsLeft.");
+            return;  // Stop metoden, hvis flashcardQueue er null
         }
+
+        // Opdatering af antal kort tilbage baseret på køens størrelse
+        this.totalCardsLeft = flashcardQueue.size();  // Brug køens størrelse som det korrekte antal kort
+        System.out.println("Total cards left: " + totalCardsLeft);
     }
+
+    public FlashcardDeck getCurrentDeck() {
+        return currentDeck;
+    }
+
 }

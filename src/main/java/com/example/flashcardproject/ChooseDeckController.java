@@ -12,6 +12,13 @@ import java.io.IOException;
 
 public class ChooseDeckController {
 
+    private FlashcardController flashcardController;
+
+    public void setFlashcardController(FlashcardController flashcardController) {
+        this.flashcardController = flashcardController;
+    }
+
+
     @FXML
     private ListView<String> deckListView;
 
@@ -37,16 +44,24 @@ public class ChooseDeckController {
             return;
         }
 
-        // Hent det valgte deck fra DeckManager
         FlashcardDeck selectedDeck = DeckManager.getInstance().getDeckByName(selectedDeckName);
         if (selectedDeck == null || selectedDeck.getFlashcards().isEmpty()) {
             showAlert("Deck Not Found", "The selected deck could not be found.");
             return;
         }
 
-        // Start træningssessionen
+        // Fortæl FlashcardController, hvilket deck der er valgt
+        if (flashcardController != null && flashcardController.getTrainingController() != null) {
+            flashcardController.getTrainingController().setFlashcardDeck(selectedDeck);
+            System.out.println("Deck blev sendt til TrainingController fra ChooseDeckController: " + selectedDeck.getFlashcardDeckName());
+        } else {
+            System.err.println("FlashcardController eller TrainingController er ikke initialiseret korrekt.");
+        }
+
+        // Start træningssessionen og vis UI
         startTrainingSession(selectedDeck);
     }
+
 
     private void startTrainingSession(FlashcardDeck deck) {
         try {
@@ -54,16 +69,20 @@ public class ChooseDeckController {
             VBox trainingView = loader.load();
             TrainingController trainingController = loader.getController();
 
-            // Overfør decket til TrainingController
+            // Brug singleton-instansen af TrainingSession
+            TrainingSession trainingSession = TrainingSession.getInstance();
+            trainingSession.startSession(deck.getFlashcardDeckName());
+
+            trainingController.setTrainingSession(trainingSession);
             trainingController.setFlashcardDeck(deck);
 
             BorderPane root = (BorderPane) deckListView.getScene().getRoot();
-            root.setCenter(trainingView); // Beholder resten af layoutet
-
+            root.setCenter(trainingView);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

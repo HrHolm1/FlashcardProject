@@ -31,9 +31,20 @@ public class FlashcardController {
             VBox trainingView = loader.load();
             root.setCenter(trainingView);
             trainingController = loader.getController();
+
+            if (trainingController == null) {
+                System.err.println("Fejl: trainingController blev ikke initialiseret korrekt!");
+            } else {
+                System.out.println("trainingController blev initialiseret korrekt.");
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public TrainingController getTrainingController() {
+        return trainingController;
     }
 
     @FXML
@@ -67,18 +78,27 @@ public class FlashcardController {
     }
 
     private void updateTrainingController(String answerType) {
-        if (trainingController != null) {
-            trainingController.updateDeckOrder(answerType);  // Opdater deckrækkefølgen i TrainingController
+        if (trainingController == null) {
+            System.err.println("Fejl: TrainingController er null i updateTrainingController.");
+            return;
         }
+
+        // Sørg for, at currentDeck er sat
+        if (trainingController.getCurrentDeck() == null) {
+            System.err.println("currentDeck er null i updateTrainingController.");
+            return;
+        }
+
+        System.out.println("Opdatering af TrainingController med answerType: " + answerType);
+        trainingController.updateDeckOrder(answerType); // Opdater rækkefølge
     }
 
-    @FXML
+    @FXML // Vis skærmen til oprettelse af custom decks
     private void handleCreateDeck() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("create-deck-view.fxml"));
             VBox createDeckView = loader.load();
 
-            // Vis skærmen til oprettelse af decks
             root.setCenter(createDeckView);
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,12 +111,16 @@ public class FlashcardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("choose-deck-view.fxml"));
             VBox chooseDeckView = loader.load();
 
-            // Vis deck-valg-skærmen
+            // Hent ChooseDeckController og sæt FlashcardController-reference
+            ChooseDeckController chooseDeckController = loader.getController();
+            chooseDeckController.setFlashcardController(this); // "this" er FlashcardController
+
             root.setCenter(chooseDeckView);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 
     @FXML
     private void handleImportFiles() {
@@ -138,8 +162,13 @@ public class FlashcardController {
 
                     // Kontroller, at trainingController er initialiseret
                     if (trainingController != null) {
-                        trainingController.setFlashcardDeck(newDeck); // Send hele decket
-                        System.out.println("Deck blev sendt til TrainingController.");
+                        // Sørg for, at decket ikke er sat før
+                        if (trainingController.getCurrentDeck() == null) {
+                            trainingController.setFlashcardDeck(newDeck); // Send hele decket
+                            System.out.println("Deck blev sendt til TrainingController.");
+                        } else {
+                            System.out.println("Deck er allerede sat, overskriver ikke.");
+                        }
                     } else {
                         System.err.println("TrainingController er ikke blevet initialiseret korrekt.");
                     }

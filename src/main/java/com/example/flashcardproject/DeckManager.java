@@ -29,9 +29,11 @@ public class DeckManager {
     public FlashcardDeck getDeckByName(String name) {
         for (FlashcardDeck deck : decks) {
             if (deck.getFlashcardDeckName().equalsIgnoreCase(name)) {
+                System.out.println("Found deck: " + name);  // Log for succesfuldt fundet deck
                 return deck;
             }
         }
-        return null; // Hvis deck ikke findes
+        System.err.println("Deck not found: " + name);  // Log hvis deck ikke findes
+        return null;
     }
 }

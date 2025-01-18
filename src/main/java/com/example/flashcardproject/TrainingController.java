@@ -21,112 +21,93 @@ public class TrainingController {
     @FXML
     private Label totalCardsLeftLabel;
 
-
     private FlashcardDeck currentDeck;
     private TrainingSession trainingSession;
-    private int currentIndex;
     private Flashcard currentCard;
 
     public TrainingController() {
-        trainingSession = new TrainingSession(); // Initialiser TrainingSession
+        // Brug den samme singleton-instans
+        this.trainingSession = TrainingSession.getInstance();
     }
 
     public void setTrainingSession(TrainingSession trainingSession) {
         this.trainingSession = trainingSession;
+        System.err.println("trainingSession er allerede sat, overskriver ikke.");
     }
 
     public void setFlashcardDeck(FlashcardDeck deck) {
-        if (deck == null || deck.getFlashcards().isEmpty()) {
-            System.err.println("Decket er tomt eller ikke initialiseret!");
-            return;
+        if (deck == null) {
+            throw new IllegalArgumentException("Deck cannot be null");
         }
+
         this.currentDeck = deck;
+        System.out.println("currentDeck blev sat til: " + deck.getFlashcardDeckName());
 
-        // Start træningssessionen ved at hente decknavnet fra FlashcardDeck
-        String deckName = deck.getFlashcardDeckName();
-        trainingSession.startSession(deckName); // Brug decknavnet i stedet for hele decket
-
-        currentIndex = 0;  // Sæt indekset korrekt
-        showNextCard();  // Vis det første kort
-        updateTotalCardsLeftLabel();  // Opdater labelen med antallet af kort
+        if (trainingSession != null) {
+            trainingSession.startSession(deck.getFlashcardDeckName());
+            currentCard = trainingSession.getNextCard();
+            showNextCard();
+            updateTotalCardsLeftLabel();
+        }
     }
 
     @FXML
     private void handleShowAnswer() {
-        if (currentCard == null) return;
-
-        answerLabel.setText(currentCard.getAnswer());
-        showAnswerButton.setDisable(true); // Deaktiver knappen
+        if (currentCard != null) {
+            answerLabel.setText(currentCard.getAnswer());
+            showAnswerButton.setDisable(true);
+        }
     }
 
     @FXML
     private void handleNextCard() {
-        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
-            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
-            return;
-        }
-
-        // Debug: Tjek currentIndex og antal kort i decket
-        System.out.println("Current Index før getNextCard: " + currentIndex);
-        System.out.println("Deck størrelse: " + currentDeck.getFlashcards().size());
-
-        // Brug getNextCard til at hente næste kort
-        currentCard = trainingSession.getNextCard(currentIndex);
+        // Hent det næste kort fra køen
+        currentCard = trainingSession.getNextCard();
 
         if (currentCard != null) {
-            // Opdater currentIndex baseret på det nye kort
-            currentIndex = currentCard.getIndex(); // Opdater currentIndex med det aktuelle korts indeks
-            showNextCard();  // Vis det næste kort
-            System.out.println("Current Index efter getNextCard: " + currentIndex);  // Debug output
+            showNextCard();
         } else {
-            System.out.println("Der er ikke flere kort.");
-            nextCardButton.setDisable(true);  // Deaktiver knappen, hvis der ikke er flere kort
+            nextCardButton.setDisable(true); // Deaktiver knappen, hvis der ikke er flere kort
         }
 
-        updateTotalCardsLeftLabel();  // Opdater korttællingens label
-    }
-
-    public void updateDeckOrder(String answerType) {
-        if (currentCard == null) return;
-
-        // Opdater rækkefølgen i TrainingSession
-        trainingSession.updateDeckOrder(currentCard, answerType);
-
-        // Vis feedback for, at rækkefølgen blev opdateret
-        System.out.println("Rækkefølgen opdateret med svar: " + answerType);
-        updateTotalCardsLeftLabel();  // Opdater korttællingens label
+        // Gem progress i sessionen for decket
+        trainingSession.saveProgress(currentDeck.getFlashcardDeckName());
+        updateTotalCardsLeftLabel();  // Opdater label for antal kort tilbage
     }
 
     private void showNextCard() {
-        if (currentDeck == null || currentDeck.getFlashcards().isEmpty()) {
-            System.err.println("FlashcardDeck er tomt eller ikke initialiseret!");
-            return;
+        questionLabel.setText(currentCard.getQuestion());
+        Image image = new Image("file:" + currentCard.getFullImagePath());
+        questionImage.setImage(image);
+        answerLabel.setText("Answer is shown here");
+        showAnswerButton.setDisable(false);
+        nextCardButton.setDisable(false);
+    }
+
+    public void updateDeckOrder(String answerType) {
+        // Hent altid currentDeck fra TrainingSession
+        currentDeck = trainingSession.getCurrentDeck();
+
+        if (currentDeck == null) {
+            System.err.println("currentDeck er null i updateDeckOrder efter hentning fra TrainingSession.");
+            return; // Stop metoden, hvis currentDeck stadig er null
         }
 
-        // Hent næste kort baseret på currentIndex
-        currentCard = currentDeck.getFlashcards().get(currentIndex);
+        System.out.println("Opdaterer currentDeck for answerType " + answerType + ": " + currentDeck.getFlashcardDeckName());
 
-        if (currentCard != null) {
-            questionLabel.setText(currentCard.getQuestion());
-
-            String imagePath = currentCard.getFullImagePath();
-            Image image = new Image("file:" + imagePath);
-            questionImage.setImage(image);
-
-            System.out.println("Image Path: " + imagePath); // Debug output
-
-            answerLabel.setText("Answer is shown here");
-            showAnswerButton.setDisable(false);  // Aktiver knappen
-            nextCardButton.setDisable(false);  // Sørg for at knappen er aktiveret
-        } else {
-            System.out.println("Der er ikke flere kort.");
-            nextCardButton.setDisable(true); // Deaktiver knappen, hvis der ikke er flere kort
-        }
+        // Opdater rækkefølgen via trainingSession
+        trainingSession.updateDeckOrder(currentCard, answerType);
+        currentCard = trainingSession.getNextCard(); // Få næste kort
+        updateTotalCardsLeftLabel(); // Opdatér antal kort tilbage
     }
 
     private void updateTotalCardsLeftLabel() {
-        // Opdater totalCardsLeftLabel med antallet af kort tilbage
-        trainingSession.recalculateTotalCardsLeft();  // Sørg for at få den nyeste tælling
+        trainingSession.recalculateTotalCardsLeft();
         totalCardsLeftLabel.setText("Cards Left: " + trainingSession.getTotalCardsLeft());
     }
+
+    public FlashcardDeck getCurrentDeck() {
+        return currentDeck;  // Returnerer currentDeck for at sikre, at jeg kan kontrollere det udenfor
+    }
+
 }

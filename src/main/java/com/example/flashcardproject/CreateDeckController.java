@@ -88,6 +88,7 @@ public class CreateDeckController {
         // Tilføj decket til DeckManager
         DeckManager.getInstance().addDeck(customDeck);
 
+        // Log for at sikre, at decket er blevet tilføjet
         System.out.println("Deck saved: " + customDeck.getFlashcardDeckName());
         System.out.println("Total cards: " + customDeck.getFlashcards().size());
 
