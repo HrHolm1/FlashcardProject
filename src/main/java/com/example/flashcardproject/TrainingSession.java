@@ -9,7 +9,6 @@ public class TrainingSession {
 
     private FlashcardDeck currentDeck;
     private int totalCardsLeft;
-    private int currentIndex;
     private Map<String, Integer> deckProgressMap = new HashMap<>();
     private Queue<Flashcard> flashcardQueue = new LinkedList<>();
 
@@ -38,7 +37,6 @@ public class TrainingSession {
         flashcardQueue.addAll(deck.getFlashcards());
         System.out.println("Session started for deck: " + currentDeck.getFlashcardDeckName());
     }
-
 
     public void updateDeckOrder(Flashcard currentCard, String answerType) {
         System.out.println("TrainingSession instance: " + this);
@@ -72,7 +70,6 @@ public class TrainingSession {
         // Opdater køen, efter ændringer er foretaget
         updateFlashcardQueue();
     }
-
 
     private void updateFlashcardQueue() {
         // Tøm køen og tilføj alle kortene i den nye rækkefølge
@@ -140,5 +137,4 @@ public class TrainingSession {
     public FlashcardDeck getCurrentDeck() {
         return currentDeck;
     }
-
 }

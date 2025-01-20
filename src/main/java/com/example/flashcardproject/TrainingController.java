@@ -109,5 +109,4 @@ public class TrainingController {
     public FlashcardDeck getCurrentDeck() {
         return currentDeck;  // Returnerer currentDeck for at sikre, at jeg kan kontrollere det udenfor
     }
-
 }

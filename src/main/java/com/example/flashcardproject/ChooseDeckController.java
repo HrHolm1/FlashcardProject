@@ -62,7 +62,6 @@ public class ChooseDeckController {
         startTrainingSession(selectedDeck);
     }
 
-
     private void startTrainingSession(FlashcardDeck deck) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("training-view.fxml"));
@@ -82,7 +81,6 @@ public class ChooseDeckController {
             e.printStackTrace();
         }
     }
-
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

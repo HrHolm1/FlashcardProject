@@ -1,8 +1,12 @@
 package com.example.flashcardproject;
 
 import java.io.File;
+import java.io.Serializable;
 
-public class Flashcard {
+public class Flashcard implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private String question; // Titel på maleriet (spørgsmålet)
     private String answer;   // Kunstnerens navn (svaret)
     private String imagePath; // Stien til billedet af maleriet

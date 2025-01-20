@@ -1,14 +1,22 @@
 package com.example.flashcardproject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeckManager {
+public class DeckManager implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private static DeckManager instance; // Singleton instans
     private List<FlashcardDeck> decks;
 
     private DeckManager() {
         decks = new ArrayList<>();
+    }
+
+    public static void setInstance(DeckManager loadedInstance) {
+        instance = loadedInstance;
     }
 
     public static DeckManager getInstance() {
