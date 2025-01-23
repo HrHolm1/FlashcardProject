@@ -66,7 +66,7 @@ public class Flashcard implements Serializable {
         if (new File(imagePath).isAbsolute()) {
             return imagePath;
         } else {
-            return "C:/Users/Rambo/Documents/Flashcards/greatartists/" + imagePath;
+            return "C:/Users/robin/Documents/Flashcards/greatartists/" + imagePath;
         }
     }
 

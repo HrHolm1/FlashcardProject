@@ -9,6 +9,7 @@ public class DeckManager implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private static DeckManager instance; // Singleton instans
+
     private List<FlashcardDeck> decks;
 
     private DeckManager() {

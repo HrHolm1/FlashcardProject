@@ -14,7 +14,7 @@ public class DataMethod {
             // Opret mappen, hvis den ikke allerede findes
             File directory = new File(DIRECTORY);
             if (!directory.exists()) {
-                directory.mkdirs(); // Opret mappen og dens forældre, hvis nødvendigt
+                directory.mkdirs(); // Opret mappen
                 System.out.println("Mappen '" + DIRECTORY + "' blev oprettet.");
             }
 
