@@ -45,4 +45,15 @@ public class DeckManager implements Serializable {
         System.err.println("Deck not found: " + name);  // Log hvis deck ikke findes
         return null;
     }
+
+    public void removeDeck(String name) {
+        FlashcardDeck deckToRemove = getDeckByName(name);
+        if (deckToRemove != null) {
+            decks.remove(deckToRemove);
+            System.out.println("Deck removed: " + name);
+        } else {
+            System.err.println("Deck not found: " + name);
+        }
+    }
+
 }

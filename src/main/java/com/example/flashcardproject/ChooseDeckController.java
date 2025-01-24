@@ -89,4 +89,32 @@ public class ChooseDeckController {
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    @FXML
+    private void handleRemoveDeck() {
+        String selectedDeckName = deckListView.getSelectionModel().getSelectedItem();
+
+        if (selectedDeckName == null) {
+            showAlert("No Deck Selected", "Please select a deck to remove.");
+            return;
+        }
+
+        // Bekræft med brugeren
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirm Removal");
+        confirmation.setHeaderText("Are you sure you want to remove this deck?");
+        confirmation.setContentText("Deck: " + selectedDeckName);
+
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response.getText().equalsIgnoreCase("OK")) {
+                // Fjern deck fra DeckManager
+                DeckManager.getInstance().removeDeck(selectedDeckName);
+
+                // Opdater ListView
+                deckListView.getItems().remove(selectedDeckName);
+                showAlert("Deck Removed", "The deck '" + selectedDeckName + "' has been removed.");
+            }
+        });
+    }
+
 }

@@ -5,8 +5,9 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1" fx:controller="com.example.flashcardproject.ChooseDeckController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="10" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.flashcardproject.ChooseDeckController">
     <Label style="-fx-font-size: 18px;" text="Choose a Deck to Play" />
     <ListView fx:id="deckListView" />
     <Button onAction="#handlePlayDeck" text="Play Selected Deck" />
+   <Button mnemonicParsing="false" onAction="#handleRemoveDeck" text="Remove Seleceted Deck" />
 </VBox>
